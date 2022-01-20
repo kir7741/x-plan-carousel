@@ -20,11 +20,13 @@
   },
   "contributors": [
     {
-      "name" : "Andy Chien",
-      "url" : "https://github.com/andy511032002"
+      "name": "Andy Chien",
+      "url": "https://github.com/andy511032002"
     }
   ],
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/kir7741/x-plan-carousel/issues"
@@ -46,8 +48,13 @@
     "sass-loader": "^12.3.0",
     "style-loader": "^3.3.1",
     "url-loader": "^4.1.1",
-    "webpack": "^5.61.0",
+    "webpack": "^5.66.0",
     "webpack-cli": "^4.9.1"
   },
-  "homepage": "https://github.com/kir7741/x-plan-carousel#readme"
+  "homepage": "https://github.com/kir7741/x-plan-carousel#readme",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "file-loader": "^6.2.0",
+    "jquery": "^3.6.0"
+  }
 }

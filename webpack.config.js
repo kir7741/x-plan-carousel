@@ -2,6 +2,7 @@ const path = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const Dotenv = require('dotenv-webpack');
+const webpack = require('webpack');
 
 module.exports = (env, argv) => {
 
@@ -64,9 +65,19 @@ module.exports = (env, argv) => {
 
             }
          ]
-        }
+        },
+
+        // 將 fontawesome svg, woff...等檔案引入到
+        {
+          test: /\.(svg|eot|woff|woff2|ttf)$/,
+          type: 'asset/resource',
+          generator: {
+            filename: 'fonts/[hash][ext][query]'
+          }
+       },
       ],
     },
+    watch: true,
     plugins: [
       new CleanWebpackPlugin(),
       new Dotenv({
@@ -74,7 +85,15 @@ module.exports = (env, argv) => {
       }),
       new MiniCssExtractPlugin({
         filename: 'css/[name].css',
-      })
-    ]
+      }),
+
+      // webpack 引入 jquery
+      new webpack.ProvidePlugin({
+        $: 'jquery',
+        jQuery: 'jquery',
+        'window.jQuery': 'jquery'
+     })
+    ],
+
   })
 };
