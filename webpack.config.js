@@ -78,6 +78,7 @@ module.exports = (env, argv) => {
       ],
     },
     watch: true,
+    devtool: 'source-map',
     plugins: [
       new CleanWebpackPlugin(),
       new Dotenv({

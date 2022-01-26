@@ -37,6 +37,11 @@
 
       window.onload = function() {
         const a = $('.carousel-container').XPlanCarousel();
+
+        $('.arrow.right').click(function() {
+          console.log('click')
+          a.trigger('next.XPlanCarousel');
+        })
       }
 
     </script>

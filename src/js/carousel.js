@@ -26,7 +26,21 @@ export default function Carousel(className, shortHand = false) {
           data = new className(this, options);
           $this.data(dataName, data);
 
-          // TODO: 綁定事件
+          $.each([
+            'next', 'prev'
+            // , 'to', 'destroy', 'refresh', 'replace', 'add', 'remove'
+          ], function(i, event) {
+            // data.register({ type: Owl.Type.Event, name: event });
+            // $.proxy => bind
+            data.$element.on(event + '.XPlanCarousel', $.proxy(function(e) {
+
+              // if (e.namespace && e.relatedTarget !== this) {
+              this.suppress([ event ]);
+              data[event].apply(this, [].slice.call(arguments, 1));
+              this.release([ event ]);
+              // }
+            }, data));
+          });
           
         }
 
