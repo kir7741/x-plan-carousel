@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="./dist/css/main.css">
 </head>
 <body>
-  <div class="carousel-container" data-index="abc"  data-index2="ccc">
+  <div class="carousel-container">
     <span class="arrow left">
       <i class="fas fa-chevron-left"></i>
     </span>
@@ -37,11 +37,13 @@
 
       window.onload = function() {
         const a = $('.carousel-container').XPlanCarousel();
+        console.log(a)
 
         $('.arrow.right').click(function() {
           console.log('click')
           a.trigger('next.XPlanCarousel');
         })
+
       }
 
     </script>
