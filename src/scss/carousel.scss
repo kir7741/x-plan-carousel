@@ -3,47 +3,54 @@ $fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
 @import '~@fortawesome/fontawesome-free/scss/solid';
 @import '~@fortawesome/fontawesome-free/scss/regular';
 
-.carousel-container {
+.x-plan-carousel {
   position: relative;
-  display: flex;
-  flex-wrap: nowrap;
-  overflow: hidden;
 
-  .carousel-item {
-    flex: 0 0 100%;
-    height: 150px;
+  .carousel-item-outer {
+    position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
 
-    &:nth-child(1) {
-      background-color: red;
+    .carousel-item {
+      flex: 0 0 100%;
+      height: 150px;
+  
+      &:nth-child(1) {
+        background-color: red;
+      }
+      &:nth-child(2) {
+        background-color: orange;
+      }
+      &:nth-child(3) {
+        background-color: yellow;
+      }
+      &:nth-child(4) {
+        background-color: green;
+      }
+      &:nth-child(5) {
+        background-color: blue;
+      }
+  
+  
     }
-    &:nth-child(2) {
-      background-color: orange;
-    }
-    &:nth-child(3) {
-      background-color: yellow;
-    }
-    &:nth-child(4) {
-      background-color: green;
-    }
-    &:nth-child(5) {
-      background-color: blue;
-    }
-
 
   }
-  
+
   .arrow {
     position: absolute;
     top: 50%;
+    border: 0;
     font-size: 40px;
+    background: transparent;
     transform: translateY(-50%);
     cursor: pointer;
 
-    &.left {
+    &.x-plan-prev {
       left: 20px;
     }
 
-    &.right {
+    &.x-plan-next {
       right: 20px;
     }
 

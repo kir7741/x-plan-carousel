@@ -18,29 +18,9 @@ class XPlanCarousel {
   _options = {};
 
   constructor(element, options) {
-    this.$element = $(element);
-    this._options = options;
 
-    $.each(XPlanCarousel.Plugins, $.proxy(function(key, plugin) {
-      this._plugins[key.charAt(0).toLowerCase() + key.slice(1)]
-        = new plugin(this);
-    }, this));
-    
-    // $(window).scroll(function () {
-    //     if ($(this).scrollTop() > options.offset) {
-    //       $element.fadeIn();
-    //     } else {
-    //       $element.fadeOut();
-    //     }
-    // });
-    
-    // $element.click(function (e) {
-    //     e.preventDefault();
-        
-    //     $('html, body').animate({
-    //       scrollTop: 0
-    //     }, options.speed);
-    // });
+    this.init(element, options);
+
   }
 
   /**
@@ -82,7 +62,31 @@ class XPlanCarousel {
    *
    * @memberof XPlanCarousel
    */
-  init() {
+  init(element, options) {
+
+    this.$element = $(element);
+    this.$element.addClass(XPlanCarousel.DEFAULTS.rootClass);
+    this._options = options;
+
+    $.each(XPlanCarousel.Plugins, $.proxy(function(key, plugin) {
+      this._plugins[key.charAt(0).toLowerCase() + key.slice(1)] = new plugin(this);
+    }, this));
+    
+    // $(window).scroll(function () {
+    //     if ($(this).scrollTop() > options.offset) {
+    //       $element.fadeIn();
+    //     } else {
+    //       $element.fadeOut();
+    //     }
+    // });
+    
+    // $element.click(function (e) {
+    //     e.preventDefault();
+        
+    //     $('html, body').animate({
+    //       scrollTop: 0
+    //     }, options.speed);
+    // });
 
   }
 
@@ -91,6 +95,7 @@ class XPlanCarousel {
 XPlanCarousel.DEFAULTS = {
   offset: 100,
   speed: 500,
+  rootClass: 'x-plan-carousel'
 };
 
 XPlanCarousel.Plugins = {};

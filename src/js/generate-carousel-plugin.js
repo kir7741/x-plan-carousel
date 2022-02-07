@@ -16,9 +16,12 @@ export default function generateCarouselPlugin(className, shortHand = false) {
       // 抓取 DOM上的 data attribute
       let data = $this.data(dataName);
 
+      if (typeof option === 'object' ) {
+        delete option.rootClass;
+      }
+
       // 設定套件參數
       let options = $.extend({}, className.DEFAULTS, $this.data(), typeof option === 'object' && option);
-
       // 若無資料，則新增一個新資料給他
 
       if (!data) {
