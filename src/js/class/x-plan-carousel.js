@@ -55,6 +55,10 @@ class XPlanCarousel {
     console.log(arguments);
   }
 
+  to() {
+    console.log(arguments);
+  }
+
   /**
    * TODO: 初始化元件包含其他Plugins 
    * 參考 owl.carousel 161行 將carousel本身 傳給新的物件

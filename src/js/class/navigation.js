@@ -14,6 +14,12 @@ class Navigation {
    */
   _controls = {};
 
+  /**
+   * 複寫原功能
+   *
+   * @memberof Navigation
+   */
+  _overrides = {};
 
   constructor(carousel) {
     this.init(carousel)
@@ -21,16 +27,25 @@ class Navigation {
 
   // TODO: 上下一頁呼叫carousel的next 和 pre
   next() {
-    console.log('next');
+    this._overrides.next.bind(this._core)();
   }
 
   prev() {
-    console.log('pre');
+    this._overrides.prev.bind(this._core)();
+  }
+
+  to() {
   }
 
   init(carousel) {
 
     this._core = carousel;
+
+    this._overrides = {
+      next: this._core.next,
+      prev: this._core.prev,
+    }
+
 		this._core._options = $.extend({}, Navigation.DEFAULTS, this._core._options);
     const setting = this._core._options;
 
@@ -38,21 +53,19 @@ class Navigation {
                       $(setting.arrowContainer) :
                       $('.' + setting.rootClass)
 
-    this._controls.$previous = $('<button type="button" class="arrow">')
+    this._controls.$previous = $('<button type="button">')
                                 .addClass(setting.arrowClass[0])
+                                .addClass(setting.arrowContainer ? '' : 'arrow')
                                 .html(setting.arrowText[0])
                                 .appendTo(container)
-                                .on('click', $.proxy(function(e) {
-                                  this.prev();
-                                }, this))
+                                .on('click', () => this.prev())
 
-    this._controls.$next = $('<button' + 'type="button" class="arrow"' + '>')
+    this._controls.$next = $('<button type="button">')
                               .addClass(setting.arrowClass[1])
+                              .addClass(setting.arrowContainer ? '' : 'arrow')
                               .html(setting.arrowText[1])
                               .appendTo(container)
-                              .on('click', $.proxy(function(e) {
-                                this.next();
-                              }, this))
+                              .on('click', () => this.next())
 
   } 
 

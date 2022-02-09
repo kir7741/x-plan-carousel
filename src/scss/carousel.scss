@@ -37,14 +37,17 @@ $fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
 
   }
 
-  .arrow {
-    position: absolute;
-    top: 50%;
+  .x-plan-prev, .x-plan-next {
     border: 0;
     font-size: 40px;
     background: transparent;
-    transform: translateY(-50%);
     cursor: pointer;
+  }
+
+  .arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
 
     &.x-plan-prev {
       left: 20px;
