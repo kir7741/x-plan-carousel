@@ -17,6 +17,13 @@ class XPlanCarousel {
    */
   _options = {};
 
+  /**
+   * Dom ref
+   */
+  _controls = {};
+
+  _currentIndex = null;
+
   constructor(element, options) {
 
     this.init(element, options);
@@ -48,6 +55,7 @@ class XPlanCarousel {
   // TODO: 寫入下一頁事件  
   next() {
     console.log(arguments);
+    this.to(1)
   }
 
   // TODO: 寫入上一頁
@@ -55,8 +63,43 @@ class XPlanCarousel {
     console.log(arguments);
   }
 
-  to() {
-    console.log(arguments);
+  /**
+   * 滑動至指定目標
+   *
+   * @param {number} targetIdx - 目標索引
+   * @memberof XPlanCarousel
+   */
+  to(targetIdx) {
+
+    // transitonend 監聽 css transition 結束後的事件 
+
+    // 取得位移距離
+
+    // TODO: 最後完成時，
+    const distance = $(this._controls.$outer.children()[0]).width();
+    
+    $.each(this._controls.$outer.children(), (index, item) => {
+
+      const preCoordinate = $(item).css('left') || '';
+      const left = +preCoordinate.replace(/px/g, '') - distance;
+
+      $(item)
+        .one('transitionend', (e) => {
+          // TODO: 移除動畫用 class Name
+          // TODO: 改變動畫狀態
+          console.log('end mother fucker', e)
+          this._currentIndex = targetIdx;
+        })
+        .css('left', left)
+        .addClass('animated')
+
+      // previous.one($.support.animation.end, clear)
+      // .css( { 'left': left + 'px' } )
+      // .addClass('animated owl-animated-out')
+      // .addClass(outgoing);
+    })
+
+    this._currentIndex = targetIdx;
   }
 
   /**
@@ -70,12 +113,17 @@ class XPlanCarousel {
 
     this.$element = $(element);
     this.$element.addClass(XPlanCarousel.DEFAULTS.rootClass);
+
+    const items = this.$element.html();
+
+    this._controls.$outer = $('<div class="carousel-item-outer">').html(items);
+    this.$element.html(this._controls.$outer);
     this._options = options;
 
     $.each(XPlanCarousel.Plugins, $.proxy(function(key, plugin) {
       this._plugins[key.charAt(0).toLowerCase() + key.slice(1)] = new plugin(this);
     }, this));
-    
+
     // $(window).scroll(function () {
     //     if ($(this).scrollTop() > options.offset) {
     //       $element.fadeIn();
@@ -99,7 +147,7 @@ class XPlanCarousel {
 XPlanCarousel.DEFAULTS = {
   offset: 100,
   speed: 500,
-  rootClass: 'x-plan-carousel'
+  rootClass: 'x-plan-carousel',
 };
 
 XPlanCarousel.Plugins = {};

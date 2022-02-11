@@ -34,7 +34,14 @@ class Navigation {
     this._overrides.prev.bind(this._core)();
   }
 
-  to() {
+  /**
+   * 執行 x-plan-carousel to function
+   *
+   * @param {number} targetIdx - 目標索引
+   * @memberof Navigation
+   */
+  to(targetIdx) {
+    this._overrides.to.bind(this._core)(targetIdx);
   }
 
   init(carousel) {
