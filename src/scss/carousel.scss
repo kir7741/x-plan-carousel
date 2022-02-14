@@ -18,8 +18,8 @@ $fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
       flex: 0 0 100%;
       height: 150px;
 
-      &.animated {
-        transition: all 5s;
+      &.animate {
+        transition-property: all;
       }
   
       &:nth-child(1) {

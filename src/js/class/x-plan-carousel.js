@@ -22,7 +22,15 @@ class XPlanCarousel {
    */
   _controls = {};
 
+  /**
+   * 現在顯示的圖片索引
+   */
   _currentIndex = null;
+
+  /**
+   * 是否正在動畫中
+   */
+  _isAnimate = false;
 
   constructor(element, options) {
 
@@ -55,12 +63,13 @@ class XPlanCarousel {
   // TODO: 寫入下一頁事件  
   next() {
     console.log(arguments);
-    this.to(1)
+    this.to(this._currentIndex + 1);
   }
 
   // TODO: 寫入上一頁
-  pre() {
+  prev() {
     console.log(arguments);
+    this.to(this._currentIndex - 1);
   }
 
   /**
@@ -76,30 +85,50 @@ class XPlanCarousel {
     // 取得位移距離
 
     // TODO: 最後完成時，
+
+    if (this._isAnimate) {
+      return;
+    }
+
     const distance = $(this._controls.$outer.children()[0]).width();
+    let direction = 1;
+    this._isAnimate = true;
+
+    if (targetIdx < this._currentIndex) {
+      direction = -1
+    }
     
     $.each(this._controls.$outer.children(), (index, item) => {
 
       const preCoordinate = $(item).css('left') || '';
-      const left = +preCoordinate.replace(/px/g, '') - distance;
+      const left = +preCoordinate.replace(/px/g, '') - (distance * direction);
 
+      // TODO: 之後可增加 slidePerView 增加滑動張數
+      
       $(item)
         .one('transitionend', (e) => {
-          // TODO: 移除動畫用 class Name
-          // TODO: 改變動畫狀態
-          console.log('end mother fucker', e)
-          this._currentIndex = targetIdx;
+          $(item).removeClass('animate')
+          // TODO: 動畫完後 偷偷換位置（無限輪播用）
+
+          if (index === this._controls.$outer.children().length - 1) {
+            this._currentIndex = targetIdx;
+            this._isAnimate = false;
+
+            // TODO: 傳出換頁完成的事件出去
+            this.$element.trigger({
+              type: 'pageChanged',
+              currentIndex: this._currentIndex
+            });
+            
+          }
+
         })
         .css('left', left)
-        .addClass('animated')
+        .css('transition-duration', this._options.duringTime + 'ms')
+        .addClass('animate')
 
-      // previous.one($.support.animation.end, clear)
-      // .css( { 'left': left + 'px' } )
-      // .addClass('animated owl-animated-out')
-      // .addClass(outgoing);
     })
 
-    this._currentIndex = targetIdx;
   }
 
   /**
@@ -145,9 +174,17 @@ class XPlanCarousel {
 }
 
 XPlanCarousel.DEFAULTS = {
-  offset: 100,
-  speed: 500,
   rootClass: 'x-plan-carousel',
+  duringTime: 1000, // 滑動時間
+  autoPlay: null,
+  // {
+    // delay: 3000, // 每張圖停幾秒
+    // disabledOnInteraction: false // 跟畫面有互動時，不觸發 autoplay
+  // }
+  loop: false, 
+  slidePerView: 1, // 畫面上一次顯示幾張
+  arrowButton: true,
+  showDot: true,
 };
 
 XPlanCarousel.Plugins = {};
