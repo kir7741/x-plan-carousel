@@ -41,6 +41,7 @@ class Navigation {
    * @memberof Navigation
    */
   to(targetIdx) {
+    console.log(targetIdx)
     this._overrides.to.bind(this._core)(targetIdx);
   }
 
@@ -51,6 +52,7 @@ class Navigation {
     this._overrides = {
       next: this._core.next,
       prev: this._core.prev,
+      to: this._core.to,
     }
 
 		this._core._options = $.extend({}, Navigation.DEFAULTS, this._core._options);
@@ -73,6 +75,25 @@ class Navigation {
                               .html(setting.arrowText[1])
                               .appendTo(container)
                               .on('click', () => this.next())
+                              
+    this._controls.$dotContainer = $('<div class="dot-container">').appendTo(container);
+
+    this._controls.$dots = [];
+
+    $.each(this._core._controls.$outer.children(), (index, item) => {
+
+      this._controls.$dots[index] = $(item);
+
+      const dot = $('<span class="dot">').on('click', (e) => {
+        console.log(e)
+        e.stopPropagation();
+        this.to(index);
+      });
+
+      this._controls.$dotContainer.append(dot);
+      
+    });
+
 
   } 
 

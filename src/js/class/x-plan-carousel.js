@@ -62,13 +62,13 @@ class XPlanCarousel {
 
   // TODO: 寫入下一頁事件  
   next() {
-    console.log(arguments);
+    // console.log(arguments);
     this.to(this._currentIndex + 1);
   }
 
   // TODO: 寫入上一頁
   prev() {
-    console.log(arguments);
+    // console.log(arguments);
     this.to(this._currentIndex - 1);
   }
 
@@ -86,48 +86,47 @@ class XPlanCarousel {
 
     // TODO: 最後完成時，
 
+    console.log(this._isAnimate)
+
     if (this._isAnimate) {
       return;
     }
 
     const distance = $(this._controls.$outer.children()[0]).width();
-    let direction = 1;
     this._isAnimate = true;
 
-    if (targetIdx < this._currentIndex) {
-      direction = -1
-    }
-    
     $.each(this._controls.$outer.children(), (index, item) => {
 
       const preCoordinate = $(item).css('left') || '';
-      const left = +preCoordinate.replace(/px/g, '') - (distance * direction);
+      const left = +preCoordinate.replace(/px/g, '') - distance * (targetIdx - this._currentIndex) ;
 
       // TODO: 之後可增加 slidePerView 增加滑動張數
       
       $(item)
         .one('transitionend', (e) => {
           $(item).removeClass('animate')
+          console.log('reset!!')
           // TODO: 動畫完後 偷偷換位置（無限輪播用）
-
+          // FIXME: dot 頻繁切換會導致 isAnimate 無法正常切換 導致動畫失敗
           if (index === this._controls.$outer.children().length - 1) {
             this._currentIndex = targetIdx;
             this._isAnimate = false;
-
-            // TODO: 傳出換頁完成的事件出去
+            console.log(this._currentIndex)
             this.$element.trigger({
               type: 'pageChanged',
               currentIndex: this._currentIndex
             });
+
             
           }
 
         })
         .css('left', left)
         .css('transition-duration', this._options.duringTime + 'ms')
-        .addClass('animate')
+        .addClass('animate');
 
-    })
+
+    });
 
   }
 
