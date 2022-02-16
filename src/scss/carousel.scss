@@ -61,7 +61,7 @@ $fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
       background-color: rgba(200, 200, 200, 0.8);
       cursor: pointer;
 
-      &::before {
+      &.active::before {
         content: '';
         display: block;
         position: relative;

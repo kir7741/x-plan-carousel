@@ -41,7 +41,6 @@ class Navigation {
    * @memberof Navigation
    */
   to(targetIdx) {
-    console.log(targetIdx)
     this._overrides.to.bind(this._core)(targetIdx);
   }
 
@@ -82,18 +81,18 @@ class Navigation {
 
     $.each(this._core._controls.$outer.children(), (index, item) => {
 
-      this._controls.$dots[index] = $(item);
 
-      const dot = $('<span class="dot">').on('click', (e) => {
-        console.log(e)
-        e.stopPropagation();
-        this.to(index);
-      });
+      const dot = $('<span class="dot">')
+        .addClass(index === 0 ? 'active' : '')
+        .on('click', (e) => {
+          e.stopPropagation();
+          this.to(index);
+        });
 
       this._controls.$dotContainer.append(dot);
+      this._controls.$dots[index] = $(dot);
       
     });
-
 
   } 
 
