@@ -23,6 +23,11 @@ class XPlanCarousel {
   _controls = {};
 
   /**
+   * 真實資料長度
+   */
+  _realItemLength = 0;
+
+  /**
    * 現在顯示的圖片索引
    */
   _currentIndex = null;
@@ -115,6 +120,7 @@ class XPlanCarousel {
               type: 'pageChanged',
               currentIndex: this._currentIndex
             });
+            this.updateCarousel();
           }
 
         })
@@ -126,6 +132,8 @@ class XPlanCarousel {
 
   }
 
+  //  -2 -1 01234 567
+  //   4  5 12345 123
   /**
    * TODO: 初始化元件包含其他Plugins 
    * 參考 owl.carousel 161行 將carousel本身 傳給新的物件
@@ -135,37 +143,49 @@ class XPlanCarousel {
    */
   init(element, options) {
 
+    // 先複製 抓要顯示個寬度 算總長度 設每個item寬度
+
     this.$element = $(element);
     this.$element.addClass(XPlanCarousel.DEFAULTS.rootClass);
-
-    const items = this.$element.html();
-
-    this._controls.$outer = $('<div class="carousel-item-outer">').html(items);
-    this.$element.html(this._controls.$outer);
     this._options = options;
+    this._realItemLength = $(this.$element.children()).length;
+
+    const realItems = this.$element.children();
+
+    this._controls.$stage = $('<div class="carousel-item-stage">');
+
+    $.each(realItems, (index, item) => {
+      this._controls.$stage.append($('<div class="carousel-item">').append($(item)));
+    })
+
+    const singleWidth = this.$element.width() / this._options.slidePerView;
+    let totalWidth = 0;
+    const initialTarget = this.copyCarouselItem();
+
+    this._controls.$outer = $('<div class="carousel-item-outer">').html(this._controls.$stage);
+
+    $.each(this._controls.$stage.children(), (index, item) => {
+      $(item).css('width', singleWidth + 'px');
+      totalWidth += singleWidth;
+    });
+
+    this._controls.$stage
+      .css({
+        width: totalWidth + 'px',
+				transform: 'translate3d(' + (-singleWidth * initialTarget) + 'px,0px,0px)',
+				// transition: (this.speed() / 1000) + 's' + (
+				// 	this.settings.slideTransition ? ' ' + this.settings.slideTransition : ''
+				// )
+			})
+
+    this.$element.html(this._controls.$outer);
 
     $.each(XPlanCarousel.Plugins, $.proxy(function(key, plugin) {
       this._plugins[key.charAt(0).toLowerCase() + key.slice(1)] = new plugin(this);
     }, this));
 
-    // $(window).scroll(function () {
-    //     if ($(this).scrollTop() > options.offset) {
-    //       $element.fadeIn();
-    //     } else {
-    //       $element.fadeOut();
-    //     }
-    // });
-    
-    // $element.click(function (e) {
-    //     e.preventDefault();
-        
-    //     $('html, body').animate({
-    //       scrollTop: 0
-    //     }, options.speed);
-    // });
-
   }
-  
+
   /**
    * 更新 dot class 狀態
    *
@@ -180,7 +200,50 @@ class XPlanCarousel {
 
   }
 
+  getPosition(targetIndex) {
+
+    let returnPosition = 0;
+
+    // if (this._currentIndex < targetIndex) {
+    //   for (let i = this._currentIndex ; i < ) {
+
+    //   }
+    // }
+
+  }
+
+  /**
+   * 複製輪播內容
+   *
+   * @returns
+   * @memberof XPlanCarousel
+   */
+  copyCarouselItem() {
+
+    const stage = this._controls.$stage;
+    const firstCopiedItem = stage.clone().children();
+    const secondCopiedItem = stage.clone().children();
+    const copiedLength = firstCopiedItem.length;
+    const half = Math.ceil(copiedLength / 2);
+    const rightPart = firstCopiedItem.slice(0, half).addClass('cloned');
+    const leftPart = secondCopiedItem.slice(Math.floor(copiedLength / 2)).addClass('cloned');
+
+    stage.prepend(leftPart);
+    stage.append(rightPart);
+
+    return half;
+
+  }
+
   updateCarousel() {
+
+    // item.clone().prependTo(outer);
+
+
+    // Remove A cloned Items
+
+
+    // clone new Items to front and back
 
   }
 

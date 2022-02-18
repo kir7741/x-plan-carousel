@@ -79,20 +79,17 @@ class Navigation {
 
     this._controls.$dots = [];
 
-    $.each(this._core._controls.$outer.children(), (index, item) => {
-
-
+    for (let i = 0 ; i < this._core._realItemLength ; i++) {
       const dot = $('<span class="dot">')
-        .addClass(index === 0 ? 'active' : '')
+        .addClass(i === 0 ? 'active' : '')
         .on('click', (e) => {
           e.stopPropagation();
-          this.to(index);
+          this.to(i);
         });
 
       this._controls.$dotContainer.append(dot);
-      this._controls.$dots[index] = $(dot);
-      
-    });
+      this._controls.$dots[i] = $(dot);
+    }
 
   } 
 
