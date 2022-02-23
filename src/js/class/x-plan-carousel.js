@@ -30,7 +30,12 @@ class XPlanCarousel {
   /**
    * 現在顯示的圖片索引
    */
-  _currentIndex = null;
+  _currentIndex = 0;
+
+  /**
+   * 計算用的 current index （會有負值）
+   */
+  _calcIndex = 0;
 
   /**
    * 是否正在動畫中
@@ -67,14 +72,12 @@ class XPlanCarousel {
 
   // TODO: 寫入下一頁事件  
   next() {
-    // console.log(arguments);
-    this.to(this._currentIndex + 1);
+    this.to(this._calcIndex + 1, 'right');
   }
 
   // TODO: 寫入上一頁
   prev() {
-    // console.log(arguments);
-    this.to(this._currentIndex - 1);
+    this.to(this._calcIndex - 1, 'left');
   }
 
   /**
@@ -83,57 +86,49 @@ class XPlanCarousel {
    * @param {number} targetIdx - 目標索引
    * @memberof XPlanCarousel
    */
-  to(targetIdx) {
+  to(targetIdx, direction = '') {
 
     // transitonend 監聽 css transition 結束後的事件 
 
-    // 取得位移距離
-
-    // TODO: 最後完成時，
+    const realTarget = (targetIdx + this._realItemLength) % this._realItemLength;
 
     if (
       this._isAnimate ||
-      this._currentIndex === targetIdx
+      this._currentIndex === realTarget
     ) {
       return;
     }
-
-    const distance = $(this._controls.$outer.children()[0]).width();
+    
     this._isAnimate = true;
-    this.updateDots(targetIdx);
+    this.updateDots(realTarget);
 
-    $.each(this._controls.$outer.children(), (index, item) => {
+    const movingDistance = this.getPosition(targetIdx, direction);
+    // 取得 transform 的參數
+    const transformMatrix = this._controls.$stage.css('transform').replace(/[a-z]|\(|\)| */g, '').split(',');
+    const stageX = +transformMatrix[4];
+    const coordinate = stageX + movingDistance;
 
-      const preCoordinate = $(item).css('left') || '';
-      const left = +preCoordinate.replace(/px/g, '') - distance * (targetIdx - this._currentIndex) ;
-      // TODO: 之後可增加 slidePerView 增加滑動張數
-
-      $(item)
-        .one('transitionend', (e) => {
-          $(item).removeClass('animate')
-          // TODO: 動畫完後 偷偷換位置（無限輪播用）
-
-          if (index === this._controls.$outer.children().length - 1) {
-            this._currentIndex = targetIdx;
-            this._isAnimate = false;
-            this.$element.trigger({
-              type: 'pageChanged',
-              currentIndex: this._currentIndex
-            });
-            this.updateCarousel();
-          }
-
-        })
-        .css('left', left)
-        .css('transition-duration', this._options.duringTime + 'ms')
-        .addClass('animate');
-
-    });
+    this._controls.$stage
+      .css({
+        transform: 'translate3d(' + coordinate + 'px,0px,0px)',
+        transtion: 'all',
+        transitionDuration: this._options.duringTime + 'ms'
+      })
+      .addClass('animate')
+      .one('transitionend', (e) => { 
+        this._calcIndex = targetIdx;
+        this._currentIndex = realTarget;
+        this._controls.$stage.removeClass('animate');
+        this._isAnimate = false;
+        this.$element.trigger({
+          type: 'pageChanged',
+          currentIndex: this._currentIndex
+        });
+        // this.updateCarousel();
+      })
 
   }
 
-  //  -2 -1 01234 567
-  //   4  5 12345 123
   /**
    * TODO: 初始化元件包含其他Plugins 
    * 參考 owl.carousel 161行 將carousel本身 傳給新的物件
@@ -202,13 +197,11 @@ class XPlanCarousel {
 
   getPosition(targetIndex) {
 
-    let returnPosition = 0;
+    const difference = targetIndex - this._calcIndex;
+    const singleWidth = this.$element.width() / this._options.slidePerView;
+    const movingDistance = singleWidth * difference;
 
-    // if (this._currentIndex < targetIndex) {
-    //   for (let i = this._currentIndex ; i < ) {
-
-    //   }
-    // }
+    return -movingDistance;
 
   }
 
@@ -238,7 +231,6 @@ class XPlanCarousel {
   updateCarousel() {
 
     // item.clone().prependTo(outer);
-
 
     // Remove A cloned Items
 
