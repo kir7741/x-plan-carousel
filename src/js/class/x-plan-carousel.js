@@ -28,6 +28,11 @@ class XPlanCarousel {
   _realItemLength = 0;
 
   /**
+   * 複製資料長度
+   */
+  _copyItemLength = 0;
+
+  /**
    * 現在顯示的圖片索引
    */
   _currentIndex = 0;
@@ -104,7 +109,34 @@ class XPlanCarousel {
 
     const movingDistance = this.getPosition(targetIdx, direction);
     // 取得 transform 的參數
-    const transformMatrix = this._controls.$stage.css('transform').replace(/[a-z]|\(|\)| */g, '').split(',');
+    const preTransformMatrix = this.getCurrentTransForm();
+    const preStageX = +preTransformMatrix[4];
+    const singleWidth = this.$element.width() / this._options.slidePerView;
+    const leftLimit = this._calcIndex === -(this._copyItemLength / 2);
+    const rightLimit = this._calcIndex === this._realItemLength + (this._copyItemLength / 2) - 1;
+    let initialPosition = singleWidth * this._realItemLength + preStageX;
+    let reset = false;
+
+    if (leftLimit || rightLimit) {
+
+      if (leftLimit) {
+        initialPosition = -initialPosition;
+      }
+
+      // 碰到 right 的限制時，要往左邊移動＝>加 initialPosition
+      // 碰到 left 的限制時，要往右邊移動＝>減 initialPosition
+      this._controls.$stage
+        .css({
+          transtion: 'none',
+          transitionDuration: 0 + 'ms',
+          transform: 'translate3d(' + initialPosition + 'px,0px,0px)',
+        });
+      reset = true;
+      this._calcIndex = realTarget;
+
+    }
+
+    const transformMatrix = this.getCurrentTransForm();
     const stageX = +transformMatrix[4];
     const coordinate = stageX + movingDistance;
 
@@ -116,7 +148,7 @@ class XPlanCarousel {
       })
       .addClass('animate')
       .one('transitionend', (e) => { 
-        this._calcIndex = targetIdx;
+        this._calcIndex = reset ? realTarget : targetIdx;
         this._currentIndex = realTarget;
         this._controls.$stage.removeClass('animate');
         this._isAnimate = false;
@@ -124,9 +156,17 @@ class XPlanCarousel {
           type: 'pageChanged',
           currentIndex: this._currentIndex
         });
-        // this.updateCarousel();
       })
 
+  }
+
+  /**
+   * 取得stage transform 的matrix
+   *
+   * @memberof XPlanCarousel
+   */
+  getCurrentTransForm() {
+    return transformMatrix = this._controls.$stage.css('transform').replace(/[a-z]|\(|\)| */g, '').split(',');
   }
 
   /**
@@ -155,8 +195,9 @@ class XPlanCarousel {
 
     const singleWidth = this.$element.width() / this._options.slidePerView;
     let totalWidth = 0;
-    const initialTarget = this.copyCarouselItem();
+    const leftPartLength = this.copyCarouselItem();
 
+    this._copyItemLength = leftPartLength * 2;
     this._controls.$outer = $('<div class="carousel-item-outer">').html(this._controls.$stage);
 
     $.each(this._controls.$stage.children(), (index, item) => {
@@ -167,10 +208,7 @@ class XPlanCarousel {
     this._controls.$stage
       .css({
         width: totalWidth + 'px',
-				transform: 'translate3d(' + (-singleWidth * initialTarget) + 'px,0px,0px)',
-				// transition: (this.speed() / 1000) + 's' + (
-				// 	this.settings.slideTransition ? ' ' + this.settings.slideTransition : ''
-				// )
+				transform: 'translate3d(' + (-singleWidth * leftPartLength) + 'px,0px,0px)',
 			})
 
     this.$element.html(this._controls.$outer);
@@ -187,6 +225,7 @@ class XPlanCarousel {
    * @memberof XPlanCarousel
    */
   updateDots(targetIndex) {
+
     const dots = this._plugins.navigation._controls.$dots;
 
     $.each(dots, (index, dot) => {
@@ -194,7 +233,10 @@ class XPlanCarousel {
     });
 
   }
-
+  
+  /**
+   * 計算位移距離
+   */
   getPosition(targetIndex) {
 
     const difference = targetIndex - this._calcIndex;
@@ -217,14 +259,22 @@ class XPlanCarousel {
     const firstCopiedItem = stage.clone().children();
     const secondCopiedItem = stage.clone().children();
     const copiedLength = firstCopiedItem.length;
-    const half = Math.ceil(copiedLength / 2);
-    const rightPart = firstCopiedItem.slice(0, half).addClass('cloned');
-    const leftPart = secondCopiedItem.slice(Math.floor(copiedLength / 2)).addClass('cloned');
+    const half = Math.ceil(copiedLength / 2); // 3
+    let rightPart = null;
+    let leftPart = null;
+
+    if (half >= this._options.slidePerView) {
+      rightPart = firstCopiedItem.slice(0, half).addClass('cloned');
+      leftPart = secondCopiedItem.slice(Math.floor(copiedLength / 2)).addClass('cloned');
+    } else {
+      rightPart = firstCopiedItem.slice(0, this._options.slidePerView).addClass('cloned');
+      leftPart = secondCopiedItem.slice(copiedLength - this._options.slidePerView, copiedLength ).addClass('cloned');
+    }
 
     stage.prepend(leftPart);
     stage.append(rightPart);
 
-    return half;
+    return leftPart.length;
 
   }
 

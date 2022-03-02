@@ -91,6 +91,12 @@ $fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
 }
 
 .item {
-  font-size: 40px;
   text-align: center;
+  font-size: 40px;
+  background-color: rgb(
+    calc(var(--index)),
+    calc(var(--index) - 40),
+    255
+  );
+
 }
