@@ -44,6 +44,10 @@ class Navigation {
     this._overrides.to.bind(this._core)(targetIdx);
   }
 
+  resetCarouselPosition() {
+    this._overrides.resetCarouselPosition.bind(this._core)(); 
+  }
+
   init(carousel) {
 
     this._core = carousel;
@@ -52,6 +56,7 @@ class Navigation {
       next: this._core.next,
       prev: this._core.prev,
       to: this._core.to,
+      resetCarouselPosition: this._core.resetCarouselPosition
     }
 
 		this._core._options = $.extend({}, Navigation.DEFAULTS, this._core._options);
@@ -84,6 +89,7 @@ class Navigation {
         .addClass(i === 0 ? 'active' : '')
         .on('click', (e) => {
           e.stopPropagation();
+          this.resetCarouselPosition();
           this.to(i);
         });
 

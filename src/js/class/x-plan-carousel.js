@@ -91,51 +91,37 @@ class XPlanCarousel {
    * @param {number} targetIdx - 目標索引
    * @memberof XPlanCarousel
    */
-  to(targetIdx, direction = '') {
-
-    // transitonend 監聽 css transition 結束後的事件 
+  to(targetIdx) {
 
     const realTarget = (targetIdx + this._realItemLength) % this._realItemLength;
 
     if (
       this._isAnimate ||
-      this._currentIndex === realTarget
+      this._currentIndex === realTarget ||
+      (
+        !this._options.loop &&
+        ((targetIdx < 0) || (targetIdx >= this._realItemLength))
+      )
     ) {
       return;
     }
     
     this._isAnimate = true;
     this.updateDots(realTarget);
-
-    const movingDistance = this.getPosition(targetIdx, direction);
+    const movingDistance = this.getPosition(targetIdx);
     // 取得 transform 的參數
-    const preTransformMatrix = this.getCurrentTransForm();
-    const preStageX = +preTransformMatrix[4];
-    const singleWidth = this.$element.width() / this._options.slidePerView;
     const leftLimit = this._calcIndex === -(this._copyItemLength / 2);
     const rightLimit = this._calcIndex === this._realItemLength + (this._copyItemLength / 2) - 1;
-    let initialPosition = singleWidth * this._realItemLength + preStageX;
     let reset = false;
 
     if (leftLimit || rightLimit) {
-
-      if (leftLimit) {
-        initialPosition = -initialPosition;
-      }
-
       // 碰到 right 的限制時，要往左邊移動＝>加 initialPosition
       // 碰到 left 的限制時，要往右邊移動＝>減 initialPosition
-      this._controls.$stage
-        .css({
-          transtion: 'none',
-          transitionDuration: 0 + 'ms',
-          transform: 'translate3d(' + initialPosition + 'px,0px,0px)',
-        });
+      this.resetCarouselPosition();
       reset = true;
-      this._calcIndex = realTarget;
-
     }
 
+    // transitonend 監聽 css transition 結束後的事件 
     const transformMatrix = this.getCurrentTransForm();
     const stageX = +transformMatrix[4];
     const coordinate = stageX + movingDistance;
@@ -278,14 +264,30 @@ class XPlanCarousel {
 
   }
 
-  updateCarousel() {
+  /**
+   * 重置 carousel 的動畫位置
+   *
+   * @memberof XPlanCarousel
+   */
+  resetCarouselPosition() {
 
-    // item.clone().prependTo(outer);
+    if (this._isAnimate) {
+      return;
+    }
 
-    // Remove A cloned Items
+    const singleWidth = this.$element.width() / this._options.slidePerView;
+    const initialPosition = -singleWidth * (this._copyItemLength / 2 + this._currentIndex);
 
+    this
+      ._controls
+      .$stage
+      .css({
+        transtion: 'none',
+        transitionDuration: 0 + 'ms',
+        transform: 'translate3d(' + initialPosition + 'px,0px,0px)',
+      });
 
-    // clone new Items to front and back
+    this._calcIndex = this._currentIndex;
 
   }
 
